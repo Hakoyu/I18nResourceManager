@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<PathMap>$(SolutionDir)=$(MSBuildProjectName.Replace(" ", "_"))/</PathMap>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Resources\NLog.config" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\NLog.config" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Bogus" Version="34.0.2" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+		<PackageReference Include="Emoji.Wpf" Version="0.3.4" />
+		<PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.0.0" />
+		<PackageReference Include="HanumanInstitute.MvvmDialogs.Wpf" Version="2.0.0" />
+		<PackageReference Include="HKW.TOML" Version="1.3.0" />
+		<PackageReference Include="HKW.Utils" Version="0.1.7" />
+		<PackageReference Include="HKW.ViewModels" Version="0.6.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+		<PackageReference Include="NLog.Extensions.Logging" Version="5.3.5" />
+		<PackageReference Include="Panuon.WPF.UI" Version="1.1.16.2" />
+		<PackageReference Include="SmartFormat" Version="3.3.0" />
+		<PackageReference Include="ValueConverters" Version="3.0.26" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="HKW.WPF">
+	    <HintPath>..\HKW.WPF\bin\Release\net6.0-windows\HKW.WPF.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+</Project>

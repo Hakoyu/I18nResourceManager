@@ -1,0 +1,9 @@
+﻿<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:c="clr-namespace:ValueConverters;assembly=ValueConverters">
+  <c:ValueToBoolConverter
+    x:Key="NullToFalseConverter"
+    FalseValue="Null"
+    IsInverted="True" />
+</ResourceDictionary>
