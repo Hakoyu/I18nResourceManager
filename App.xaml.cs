@@ -20,7 +20,7 @@ public partial class App : Application
 
     private void App_Startup(object sender, StartupEventArgs e)
     {
-        var window = Ioc.Default.GetService<MainWindow>();
+        var window = Ioc.Default.GetService<StartWindow>();
         window!.Show();
     }
 }

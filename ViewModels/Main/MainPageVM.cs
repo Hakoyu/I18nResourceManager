@@ -28,36 +28,36 @@ internal partial class MainPageVM : ObservableObject
     {
         CultureNames.ListChanged += CultureNames_ListChanged;
 
-        CultureNames.Add("zh-CN");
-        I18nResources.Add(new("Text1", CultureNames));
-        CurrentI18nResource = I18nResources.First();
-        CurrentI18nResource.Datas.Add(
-            new("aaa")
-            {
-                Datas = new()
-                {
-                    ["zh-CN"] = new() { Value = "aaaText", Comment = "aaaComment" }
-                }
-            }
-        );
-        CurrentI18nResource.Datas.Add(
-            new("bbb")
-            {
-                Datas = new()
-                {
-                    ["zh-CN"] = new() { Value = "bbbText", Comment = "bbbComment" }
-                }
-            }
-        );
-        CurrentI18nResource.Datas.Add(
-            new("ccc")
-            {
-                Datas = new()
-                {
-                    ["zh-CN"] = new() { Value = "cccText", Comment = "cccComment" }
-                }
-            }
-        );
+        //CultureNames.Add("zh-CN");
+        //I18nResources.Add(new("Text1", CultureNames));
+        //CurrentI18nResource = I18nResources.First();
+        //CurrentI18nResource.Datas.Add(
+        //    new("aaa")
+        //    {
+        //        Datas = new()
+        //        {
+        //            ["zh-CN"] = new() { Value = "aaaText", Comment = "aaaComment" }
+        //        }
+        //    }
+        //);
+        //CurrentI18nResource.Datas.Add(
+        //    new("bbb")
+        //    {
+        //        Datas = new()
+        //        {
+        //            ["zh-CN"] = new() { Value = "bbbText", Comment = "bbbComment" }
+        //        }
+        //    }
+        //);
+        //CurrentI18nResource.Datas.Add(
+        //    new("ccc")
+        //    {
+        //        Datas = new()
+        //        {
+        //            ["zh-CN"] = new() { Value = "cccText", Comment = "cccComment" }
+        //        }
+        //    }
+        //);
     }
 
     /// <summary>

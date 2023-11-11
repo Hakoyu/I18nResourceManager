@@ -8,6 +8,8 @@ using I18nResourceManager.Models;
 using System.IO;
 using HKW.HKWTOML;
 using HKW.HKWTOML.Serializer;
+using I18nResourceManager.ViewModels.Main;
+using HKW.HKWTOML.Deserializer;
 
 namespace I18nResourceManager.ViewModels;
 
@@ -28,15 +30,35 @@ internal partial class StartWindowVM : ObservableObject
 
     #region Command
     [RelayCommand]
-    private void CreateProject() { }
+    private void CreateProject()
+    {
+        var window = Ioc.Default.GetService<MainWindowVM>()!;
+        //window.Closed += (v) =>
+        //{
+        //    _dialogService.Show(null, this);
+        //};
+        _dialogService.Show(null, window);
+    }
 
     [RelayCommand]
-    private void LoadProject(string path) { }
+    private void LoadProject(string path)
+    {
+        var info = TOMLDeserializer.Deserialize<I18nResInfo>(TOML.ParseFromFile(path));
+    }
 
     [RelayCommand]
     private void LoadProjectFromDirectory()
     {
-        //Directory
+        var result = _dialogService.ShowOpenFileDialog(this, Utils.I18nResInfoSettings);
+        if (result is null)
+            return;
+        var path = result.LocalPath;
+        if (path.EndsWith(Utils.I18nResInfoFile) is false)
+        {
+            _dialogService.ShowMessageBox(this, $"文件必须为 {Utils.I18nResInfoFile}");
+            return;
+        }
+        LoadProject(result.LocalPath);
     }
 
     [RelayCommand]

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace I18nResourceManager.ViewModels.Main;
 
-internal partial class MainWindowVM : ObservableObject
+internal partial class MainWindowVM : WindowVM<MainWindowVM>
 {
     private readonly ILogger<InfoPageVM> _logger = Ioc.Default
         .GetService<ILoggerFactory>()!
@@ -20,6 +20,8 @@ internal partial class MainWindowVM : ObservableObject
     private readonly IDialogService _dialogService = Ioc.Default.GetService<IDialogService>()!;
 
     public static MainWindowVM Instance { get; private set; } = null!;
+
+    public string ProjectPath { get; set; }
 
     public MainWindowVM()
     {

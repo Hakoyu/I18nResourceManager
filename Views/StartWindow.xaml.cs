@@ -32,20 +32,17 @@ internal partial class StartWindow : WindowX
         InitializeComponent();
     }
 
-    public StartWindowVM ViewModel => (StartWindowVM)DataContext;
-    private readonly IDialogService _dialogService = Ioc.Default.GetService<IDialogService>()!;
-
     private void Button_CreateNewProject_Click(object sender, RoutedEventArgs e)
     {
-        Visibility = Visibility.Hidden;
-        var editWindow = Ioc.Default.GetService<MainWindow>();
-        editWindow!.Closed += EditWindow_Closed;
-        editWindow.Show();
+        //Visibility = Visibility.Hidden;
+        //var editWindow = Ioc.Default.GetService<MainWindow>();
+        //editWindow!.Closed += EditWindow_Closed;
+        //editWindow.Show();
     }
 
     private void EditWindow_Closed(object? sender, EventArgs e)
     {
-        Visibility = Visibility.Visible;
+        //Visibility = Visibility.Visible;
     }
 
     private void Button_LoadProjectFromFile_Click(object sender, RoutedEventArgs e)

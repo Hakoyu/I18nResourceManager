@@ -87,13 +87,13 @@
       <StackPanel>
         <Button
           x:Name="Button_CreateNewProject"
-          Click="Button_CreateNewProject_Click"
+          Command="{Binding CreateProjectCommand}"
           Content="新建" />
         <Button
           x:Name="Button_LoadProjectFromFile"
-          Click="Button_LoadProjectFromFile_Click"
+          Command="{Binding LoadProjectFromDirectoryCommand}"
           Content="从文件夹载入" />
-        <Button Command="{Binding TestCommand}" Content="Test" />
+        <!--<Button Command="{Binding TestCommand}" Content="Test" />-->
       </StackPanel>
     </GroupBox>
   </Grid>

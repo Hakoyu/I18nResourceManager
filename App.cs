@@ -42,7 +42,8 @@ public partial class App
         services.AddPage<InfoPage, InfoPageVM>();
 
         services.AddWindow<MainWindow, MainWindowVM>();
-        services.AddWindow<EditTextWindow, EditTextWindowVM>(false);
+        services.AddWindow<EditTextWindow, EditTextWindowVM>();
+        services.AddWindow<LoadFilesWindow, LoadFilesWindowVM>();
     }
 
     private static void AddStartWindow(IServiceCollection services)
