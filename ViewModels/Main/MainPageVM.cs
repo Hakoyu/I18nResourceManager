@@ -17,6 +17,8 @@ namespace I18nResourceManager.ViewModels.Main;
 
 internal partial class MainPageVM : ObservableObject
 {
+    public static Guid MessageToken { get; } = Guid.NewGuid();
+
     private static readonly ILogger<InfoPageVM> _logger = Ioc.Default
         .GetService<ILoggerFactory>()!
         .CreateLogger<InfoPageVM>();
@@ -70,29 +72,36 @@ internal partial class MainPageVM : ObservableObject
         {
             foreach (var cultureName in args.NewItems!)
             {
-                WeakReferenceMessenger.Default.Send<EditCultureMessage>(new(null, cultureName));
+                WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
+                    new(null, cultureName),
+                    MessageToken
+                );
             }
         }
         else if (args.Action is ListChangeAction.Remove)
         {
             foreach (var cultureName in args.OldItems!)
             {
-                WeakReferenceMessenger.Default.Send<EditCultureMessage>(new(cultureName, null));
+                WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
+                    new(cultureName, null),
+                    MessageToken
+                );
             }
         }
-        else if (args.Action is ListChangeAction.ValueChange)
+        else if (args.Action is ListChangeAction.Replace)
         {
             var newCultureName = args.NewItems!.First();
             var oldCultureName = args.OldItems!.First();
-            WeakReferenceMessenger.Default.Send<EditCultureMessage>(
-                new(oldCultureName, newCultureName)
+            WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
+                new(oldCultureName, newCultureName),
+                MessageToken
             );
         }
     }
 
     #region Property
     [ObservableProperty]
-    private I18nResource _currentI18nResource;
+    private I18nResource _currentI18nResource = new();
 
     [ObservableProperty]
     private ObservableCollection<I18nResource> _i18nResources = new();

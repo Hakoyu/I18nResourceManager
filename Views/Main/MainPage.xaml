@@ -34,7 +34,7 @@
         <RowDefinition Height="Auto" />
         <RowDefinition />
       </Grid.RowDefinitions>
-      <Grid>
+      <Grid x:Name="Grid_Search">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition />
@@ -107,9 +107,7 @@
         </Style>
       </Grid.Style>
       <Grid.RowDefinitions>
-        <!--  TODO: 自适应最小高度  -->
-        <!--<RowDefinition Height="Auto" MinHeight="{Binding ActualHeight, ElementName=Button_AddId}" />-->
-        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" MinHeight="{Binding ActualHeight, ElementName=Grid_Search}" />
         <RowDefinition Height="Auto" />
         <RowDefinition />
       </Grid.RowDefinitions>
@@ -157,6 +155,7 @@
           TextWrapping="Wrap" />
       </Grid>
       <GridSplitter
+        x:Name="GridSplitter_1"
         Grid.Row="1"
         Height="10"
         HorizontalAlignment="Stretch"

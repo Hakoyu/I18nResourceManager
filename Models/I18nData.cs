@@ -55,4 +55,13 @@ public partial class I18nData : ObservableObject
     {
         Id = id;
     }
+
+    public I18nData(string id, IEnumerable<string> cultureNames)
+    {
+        Id = id;
+        foreach (string cultureName in cultureNames)
+        {
+            Datas.Add(cultureName, new());
+        }
+    }
 }

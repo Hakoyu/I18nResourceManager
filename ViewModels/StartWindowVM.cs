@@ -25,7 +25,7 @@ internal partial class StartWindowVM : ObservableObject
 
     #region Property
     [ObservableProperty]
-    private ObservableList<HistoricData> _historicDatas = new();
+    private ObservableListX<HistoricData> _historicDatas = new();
     #endregion
 
     #region Command

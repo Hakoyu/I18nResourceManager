@@ -22,7 +22,7 @@ namespace I18nResourceManager.Views.Main;
 /// </summary>
 internal partial class MainWindow : WindowX
 {
-    private readonly ObservableList<PageInfo> _pages = new();
+    private readonly ObservableListX<PageInfo> _pages = new();
 
     public MainWindow()
     {

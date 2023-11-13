@@ -17,19 +17,39 @@ public partial class I18nResource : ObservableObject
     private string _name = string.Empty;
 
     [ObservableProperty]
-    private ObservableCollection<I18nData> _datas = new();
+    private ObservableList<I18nData> _datas = new();
 
     public ObservableList<string> CultureNames { get; }
+
+    public I18nResource()
+        : this(string.Empty, cultureNames: new()) { }
+
+    public I18nResource(string name)
+        : this(name, cultureNames: new()) { }
+
+    public I18nResource(string name, string cultureName)
+        : this(name, cultureNames: new() { cultureName }) { }
 
     public I18nResource(string name, ObservableList<string> cultureNames)
     {
         Name = name;
         CultureNames = cultureNames;
         CultureNames.ListChanged += CultureNames_ListChanged;
+        Datas.ListChanged += Datas_ListChanged;
         foreach (var cultureName in CultureNames)
         {
             foreach (var data in Datas)
                 data.Datas.Add(cultureName, new());
+        }
+    }
+
+    private void Datas_ListChanged(NotifyListChangedEventArgs<I18nData> args)
+    {
+        if (args.Action is ListChangeAction.Add)
+        {
+            var newData = args.NewItems![0];
+            foreach (var cultureName in CultureNames)
+                newData.Datas.TryAdd(cultureName, new());
         }
     }
 
@@ -53,6 +73,17 @@ public partial class I18nResource : ObservableObject
             {
                 foreach (var data in Datas)
                     data.Datas.Remove(cultureName);
+            }
+        }
+        else if (args.Action is ListChangeAction.Replace)
+        {
+            var oldCulture = args.OldItems![0];
+            var newCulture = args.NewItems![0];
+            foreach (var data in Datas)
+            {
+                var tempData = data.Datas[oldCulture];
+                data.Datas.Remove(oldCulture);
+                data.Datas.Add(newCulture, tempData);
             }
         }
     }

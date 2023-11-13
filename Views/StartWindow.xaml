@@ -13,9 +13,10 @@
   Height="450"
   d:DataContext="{d:DesignInstance Type=vm:StartWindowVM}"
   x:ClassModifier="internal"
+  Background="{StaticResource BackgroundColor}"
   WindowStartupLocation="CenterScreen"
   mc:Ignorable="d">
-  <Grid Background="{StaticResource BackgroundColor}">
+  <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition />
       <ColumnDefinition Width="Auto" />

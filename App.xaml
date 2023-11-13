@@ -99,21 +99,6 @@
                         TextWrapping="Wrap" />
                     </ScrollViewer>
                   </Grid>
-                  <!--<CheckBox
-                  Margin="0,10,0,0"
-                  Content="{Binding CheckBoxMessage}"
-                  IsChecked="{Binding CheckBoxIsIsChecked}">
-                  <CheckBox.Style>
-                    <Style BasedOn="{StaticResource CheckBoxBaseStyle}" TargetType="CheckBox">
-                      <Setter Property="Visibility" Value="Collapsed" />
-                      <Style.Triggers>
-                        <DataTrigger Binding="{Binding ShowCheckBox}" Value="True">
-                          <Setter Property="Visibility" Value="Visible" />
-                        </DataTrigger>
-                      </Style.Triggers>
-                    </Style>
-                  </CheckBox.Style>
-                </CheckBox>-->
                 </StackPanel>
               </DataTemplate>
             </pu:MessageBoxXSettings.ContentTemplate>

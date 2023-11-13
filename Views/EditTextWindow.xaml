@@ -12,6 +12,7 @@
   Height="300"
   d:DataContext="{d:DesignInstance Type=vm:EditTextWindowVM}"
   x:ClassModifier="internal"
+  Background="{DynamicResource BackgroundColor}"
   WindowStartupLocation="CenterScreen"
   mc:Ignorable="d">
   <Grid>
@@ -21,7 +22,7 @@
     </Grid.RowDefinitions>
     <Grid>
       <TextBox
-        MinWidth="200"
+        MinWidth="300"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
         pu:TextBoxHelper.Watermark="{Binding Watermark}"
@@ -33,11 +34,16 @@
         <ColumnDefinition />
         <ColumnDefinition />
       </Grid.ColumnDefinitions>
-      <Button Command="{Binding CancelCommand}" Content="取消" />
+      <Button
+        Margin="50,5,50,5"
+        Command="{Binding CancelCommand}"
+        Content="取消" />
       <Button
         Grid.Column="1"
+        Margin="50,5,50,5"
         Command="{Binding OKCommand}"
-        Content="确定" />
+        Content="确定"
+        Style="{StaticResource Button_WindowGlassBrush}" />
     </Grid>
   </Grid>
 </pu:WindowX>
