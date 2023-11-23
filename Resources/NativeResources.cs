@@ -10,10 +10,14 @@ namespace I18nResourceManager.Resources;
 internal class NativeResources
 {
     /// <summary>
+    /// 资源根目录
+    /// </summary>
+    public const string ResourcePath = $"{nameof(I18nResourceManager)}.{nameof(Resources)}";
+
+    /// <summary>
     /// NLog资源位置
     /// </summary>
-    public const string NLogConfig =
-        $"{nameof(I18nResourceManager)}.{nameof(NativeResources)}.NLog.config";
+    public const string NLogConfig = $"{ResourcePath}.NLog.config";
 
     /// <summary>
     /// NLog文件保存位置

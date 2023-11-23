@@ -309,7 +309,7 @@
 
   <Style BasedOn="{StaticResource {x:Static pu:StyleKeys.MenuStyle}}" TargetType="Menu">
     <Setter Property="Height" Value="NaN" />
-    <Setter Property="Margin" Value="5,5,5,5" />
+    <Setter Property="Margin" Value="5" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="FontSize" Value="{DynamicResource BodyFontSize}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
@@ -323,7 +323,7 @@
     <Setter Property="pu:DropDownHelper.ShadowColor" Value="{DynamicResource G_ShadowColor}" />
     <!--    -->
     <Setter Property="pu:MenuHelper.TopLevelItemsBorderThickness" Value="0" />
-    <Setter Property="pu:MenuHelper.TopLevelItemsPadding" Value="10,0,10,0" />
+    <Setter Property="pu:MenuHelper.TopLevelItemsPadding" Value="10,5,10,5" />
     <Setter Property="pu:MenuHelper.TopLevelItemsMargin" Value="0" />
     <Setter Property="pu:MenuHelper.TopLevelItemsHorizontalContentAlignment" Value="Center" />
     <Setter Property="pu:MenuHelper.TopLevelItemsBackground" Value="{DynamicResource ButtonColor}" />
@@ -336,7 +336,7 @@
     <Setter Property="pu:MenuHelper.SubmenuItemsBorderBrush" Value="{DynamicResource BorderColor}" />
     <Setter Property="pu:MenuHelper.SubmenuItemsWidth" Value="NaN" />
     <Setter Property="pu:MenuHelper.SubmenuItemsHeight" Value="NaN" />
-    <Setter Property="pu:MenuHelper.SubmenuItemsPadding" Value="5" />
+    <Setter Property="pu:MenuHelper.SubmenuItemsPadding" Value="10,5,10,5" />
     <Setter Property="pu:MenuHelper.SubmenuItemsMargin" Value="0" />
     <!--<Setter Property="pu:MenuHelper.SubmenuItemsCornerRadius" Value="4" />-->
     <Setter Property="pu:MenuHelper.SubmenuItemsBackground" Value="{DynamicResource ButtonColor}" />

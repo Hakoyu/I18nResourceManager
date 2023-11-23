@@ -30,18 +30,10 @@ internal partial class MainPageVM : ObservableObject
     {
         CultureNames.ListChanged += CultureNames_ListChanged;
 
+        I18nResources.Add(new("Test"));
         //CultureNames.Add("zh-CN");
         //I18nResources.Add(new("Text1", CultureNames));
         //CurrentI18nResource = I18nResources.First();
-        //CurrentI18nResource.Datas.Add(
-        //    new("aaa")
-        //    {
-        //        Datas = new()
-        //        {
-        //            ["zh-CN"] = new() { Value = "aaaText", Comment = "aaaComment" }
-        //        }
-        //    }
-        //);
         //CurrentI18nResource.Datas.Add(
         //    new("bbb")
         //    {
@@ -227,7 +219,7 @@ internal partial class MainPageVM : ObservableObject
     }
 
     private static readonly Regex _getCultureNameRagex =
-        new(@"(?<=\[)(.*)(?=\])", RegexOptions.Compiled);
+        new(@"(?<=\[).*(?=\])", RegexOptions.Compiled);
 
     private static string GetCultureName(string cultureInfo)
     {
@@ -319,6 +311,26 @@ internal partial class MainPageVM : ObservableObject
         {
             _dialogService.ShowMessageBox(MainWindowVM.Instance, $"保存失败\n{ex}");
         }
+    }
+    #endregion
+
+    #region LoadFiles
+    [RelayCommand]
+    private void LoadFiles()
+    {
+        var result = _dialogService.ShowOpenFilesDialog(
+            MainWindowVM.Instance,
+            new()
+            {
+                Title = "载入文件",
+                Filters = new() { new("TOML文件", "toml"), new("所有文件", "*") }
+            }
+        );
+        if (result is null)
+            return;
+        var window = Ioc.Default.GetService<LoadFilesWindowVM>()!;
+        _dialogService.Show(MainWindowVM.Instance, window);
+        //window.LoadFiles()
     }
     #endregion
     #endregion

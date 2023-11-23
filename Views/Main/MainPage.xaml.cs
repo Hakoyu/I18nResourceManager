@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace I18nResourceManager.Views.Main;
 
@@ -24,42 +25,55 @@ internal partial class MainPage : Page
     public MainPage()
     {
         InitializeComponent();
+        // 注册消息
         WeakReferenceMessenger.Default.Register<EditCultureMessage, Guid>(
             this,
             MainPageVM.MessageToken,
-            (s, e) =>
-            {
-                if (
-                    string.IsNullOrEmpty(e.Value.OldCultureName)
-                    && string.IsNullOrEmpty(e.Value.NewCultureName)
-                )
-                    throw new("???");
-                if (
-                    string.IsNullOrEmpty(e.Value.OldCultureName) is false
-                    && string.IsNullOrEmpty(e.Value.NewCultureName) is false
-                )
-                {
-                    var newCulture = CultureInfo.GetCultureInfo(e.Value.NewCultureName);
-                    var oldCulture = CultureInfo.GetCultureInfo(e.Value.OldCultureName);
-                    ReplaceCulture(_dataGridI18nColumns, oldCulture, newCulture);
-                }
-                else if (string.IsNullOrEmpty(e.Value.NewCultureName) is false)
-                {
-                    var newCulture = CultureInfo.GetCultureInfo(e.Value.NewCultureName);
-                    AddCulture(DataGrid_Datas, _dataGridI18nColumns, newCulture);
-                }
-                else if (string.IsNullOrEmpty(e.Value.OldCultureName) is false)
-                {
-                    var oldCulture = CultureInfo.GetCultureInfo(e.Value.OldCultureName);
-                    RemoveCulture(DataGrid_Datas, _dataGridI18nColumns, oldCulture);
-                }
-            }
+            MessageHandler
         );
+        // 注册关闭事件
+        Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+    }
+
+    private void Dispatcher_ShutdownStarted(object? sender, EventArgs e)
+    {
+        // 关闭后解除消息的注册
+        WeakReferenceMessenger.Default.Unregister<EditCultureMessage, Guid>(
+            this,
+            MainPageVM.MessageToken
+        );
+    }
+
+    private void MessageHandler(object sender, EditCultureMessage message)
+    {
+        if (
+            string.IsNullOrEmpty(message.Value.OldCultureName)
+            && string.IsNullOrEmpty(message.Value.NewCultureName)
+        )
+            throw new("???");
+        if (
+            string.IsNullOrEmpty(message.Value.OldCultureName) is false
+            && string.IsNullOrEmpty(message.Value.NewCultureName) is false
+        )
+        {
+            var newCulture = CultureInfo.GetCultureInfo(message.Value.NewCultureName);
+            var oldCulture = CultureInfo.GetCultureInfo(message.Value.OldCultureName);
+            ReplaceCulture(_dataGridI18nColumns, oldCulture, newCulture);
+        }
+        else if (string.IsNullOrEmpty(message.Value.NewCultureName) is false)
+        {
+            var newCulture = CultureInfo.GetCultureInfo(message.Value.NewCultureName);
+            AddCulture(DataGrid_Datas, _dataGridI18nColumns, newCulture);
+        }
+        else if (string.IsNullOrEmpty(message.Value.OldCultureName) is false)
+        {
+            var oldCulture = CultureInfo.GetCultureInfo(message.Value.OldCultureName);
+            RemoveCulture(DataGrid_Datas, _dataGridI18nColumns, oldCulture);
+        }
     }
 
     private readonly Dictionary<string, DataGridI18nColumn> _dataGridI18nColumns = new();
 
-    // TODO: 国际化标头
     public const string ValueBindingFormat = "Datas[{0}].Value";
     public const string CommentBindingFormat = "Datas[{0}].Comment";
     public const string CommentHeaderFormat = "{0} - Comment";
@@ -172,6 +186,25 @@ internal partial class MainPage : Page
         };
         TextBox_EditText.SetBinding(TextBox.TextProperty, binding);
         TextBox_EditText.IsEnabled = true;
+    }
+
+    private void GridSplitter_1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not GridSplitter splitter)
+            return;
+        if (splitter.Margin.Bottom < 0)
+            return;
+    }
+
+    private void GridSplitter_1_DragCompleted(
+        object sender,
+        System.Windows.Controls.Primitives.DragCompletedEventArgs e
+    )
+    {
+        if (sender is not GridSplitter splitter)
+            return;
+        if (DataGrid_Datas.ActualHeight > 0)
+            return;
     }
 }
 

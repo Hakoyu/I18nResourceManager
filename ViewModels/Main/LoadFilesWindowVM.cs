@@ -14,55 +14,71 @@ namespace I18nResourceManager.ViewModels.Main;
 internal partial class LoadFilesWindowVM : ObservableObject
 {
     public static Guid MessageToken { get; } = Guid.NewGuid();
+
     private readonly ILogger<LoadFilesWindowVM> _logger = Ioc.Default
         .GetService<ILoggerFactory>()!
         .CreateLogger<LoadFilesWindowVM>();
 
     private readonly IDialogService _dialogService = Ioc.Default.GetService<IDialogService>()!;
 
-    public ObservableList<LoadFileInfo> LoadFileInfos { get; set; } = new();
+    [ObservableProperty]
+    public ObservableList<DataFileInfo> _loadFileInfos = new();
 
-    public ObservableList<I18nData> AllDatas { get; set; }
+    [ObservableProperty]
+    public ObservableList<I18nData> _allDatas = new();
 
     public LoadFilesWindowVM() { }
 
-    public IEnumerable<I18nData>? LoadFiles(IEnumerable<string> files)
+    public void LoadFiles(IEnumerable<string> files)
     {
-        try
+        List<string> errorFiles = new();
+        foreach (var file in files)
         {
-            foreach (var file in files)
+            try
             {
-                var fileName = Path.GetFileNameWithoutExtension(file);
-                var fileInfo = new LoadFileInfo()
-                {
-                    FileName = fileName,
-                    FilePath = file,
-                    Culture = Utils.GetCultureInfo(fileName) is CultureInfo cultureInfo
-                        ? cultureInfo.Name
-                        : string.Empty
-                };
+                var fileInfo = GetFileInfo(file);
                 LoadFileInfos.Add(fileInfo);
                 LoadFile(fileInfo);
             }
+            catch
+            {
+                errorFiles.Add(file);
+                // TODO: Add log
+            }
         }
-        catch (Exception ex)
+        if (errorFiles.Count > 0)
         {
-            _dialogService.ShowMessageBox(this, $"载入文件失败\n{ex}");
-            return null;
+            _dialogService.ShowMessageBox(
+                this,
+                $"以下文件载入失败\n{string.Join(Environment.NewLine, errorFiles)}"
+            );
         }
-        return null;
     }
 
-    private void LoadFile(LoadFileInfo fileInfo) { }
+    public static DataFileInfo GetFileInfo(string file)
+    {
+        var fileName = Path.GetFileNameWithoutExtension(file);
+        return new()
+        {
+            FileName = fileName,
+            FilePath = file,
+            Culture = Utils.GetCultureInfo(fileName) is CultureInfo cultureInfo
+                ? cultureInfo.Name
+                : string.Empty
+        };
+    }
 
-    private void LoadTomlFile(LoadFileInfo fileInfo)
+    private void LoadFile(DataFileInfo fileInfo)
+    {
+        if (fileInfo.FilePath.EndsWith(TOML.TOMLExtension))
+            LoadTomlFile(fileInfo);
+    }
+
+    private void LoadTomlFile(DataFileInfo fileInfo)
     {
         var toml = TOML.ParseFromFile(fileInfo.FilePath);
-        var res = new I18nResource(fileInfo.FileName, fileInfo.Culture);
         foreach (var item in toml)
-        {
-            res.Datas.Add(new(item.Key) { Datas = new() });
-        }
+            fileInfo.Datas.Add(new(item.Key) { Datas = new() });
     }
 
     #region Property

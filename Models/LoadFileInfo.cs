@@ -3,7 +3,7 @@ using HKW.HKWUtils.Collections;
 
 namespace I18nResourceManager.Models;
 
-public partial class LoadFileInfo : ObservableObject
+public partial class DataFileInfo : ObservableObject
 {
     [ObservableProperty]
     private string _fileName = string.Empty;

@@ -12,9 +12,9 @@
   Title="LoadFilesWindow"
   Width="800"
   Height="450"
-  d:DataContext="{d:DesignInstance Type=vm:InfoPageVM}"
+  d:DataContext="{d:DesignInstance Type=vm:LoadFilesWindowVM}"
   mc:Ignorable="d">
-  <Grid>
+  <Grid x:Name="Grid_Main">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto" MinWidth="200" />
       <ColumnDefinition />
@@ -37,29 +37,15 @@
         </ComboBox>
       </Grid>
       <Grid Grid.Row="1" Margin="5">
-        <ListBox
+        <ItemsControl
           x:Name="ListBox_Datas"
           d:ItemsSource="{d:SampleData ItemCount=5}"
-          ItemContainerStyle="{x:Null}"
-          ItemsSource="{Binding I18nResources}"
+          ItemsSource="{Binding LoadFileInfos}"
           ScrollViewer.IsDeferredScrollingEnabled="True"
-          SelectedItem="{Binding CurrentI18nResource}"
           VirtualizingStackPanel.VirtualizationMode="Recycling">
-          <ListBox.ItemTemplate>
+          <ItemsControl.ItemTemplate>
             <DataTemplate>
               <Grid Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}">
-                <Grid.ContextMenu>
-                  <ContextMenu>
-                    <MenuItem
-                      Command="{Binding PlacementTarget.Tag.EditResourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"
-                      CommandParameter="{Binding}"
-                      Header="重命名" />
-                    <MenuItem
-                      Command="{Binding PlacementTarget.Tag.RemoveResourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"
-                      CommandParameter="{Binding}"
-                      Header="删除" />
-                  </ContextMenu>
-                </Grid.ContextMenu>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="Auto" />
                   <ColumnDefinition />
@@ -67,19 +53,30 @@
                 <CheckBox />
                 <StackPanel Grid.Column="1">
                   <TextBox HorizontalAlignment="Left" pu:TextBoxHelper.Watermark="指定文化" />
-                  <TextBlock ToolTip="{Binding Text, RelativeSource={RelativeSource Mode=Self}}" />
+                  <TextBlock
+                    Margin="5"
+                    d:Text="文件名"
+                    ToolTip="{Binding Text, RelativeSource={RelativeSource Mode=Self}}" />
                 </StackPanel>
               </Grid>
             </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
       </Grid>
     </Grid>
     <Grid Grid.Column="1">
       <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" MinHeight="{Binding ActualHeight, ElementName=Grid_Search}" />
+        <RowDefinition Height="Auto" MinHeight="{Binding ActualHeight, ElementName=Grid_Search}">
+          <!--  设置第一行最大高度只能为当前页面高度的一半  -->
+          <RowDefinition.MaxHeight>
+            <MultiBinding Converter="{StaticResource CalculatorConverter}" ConverterParameter="/">
+              <Binding ElementName="Grid_Main" Path="ActualHeight" />
+              <Binding Source="2" />
+            </MultiBinding>
+          </RowDefinition.MaxHeight>
+        </RowDefinition>
         <RowDefinition Height="Auto" />
-        <RowDefinition />
+        <RowDefinition MinHeight="100" />
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
       <TextBox
@@ -103,7 +100,7 @@
           CanUserAddRows="False"
           CanUserReorderColumns="False"
           CurrentCellChanged="DataGrid_Datas_CurrentCellChanged"
-          ItemsSource="{Binding SelectedItem.Datas, ElementName=ListBox_Datas}"
+          ItemsSource="{Binding I18nDatas}"
           ScrollViewer.IsDeferredScrollingEnabled="True"
           VirtualizingStackPanel.VirtualizationMode="Recycling">
           <DataGrid.ColumnHeaderStyle>
@@ -156,12 +153,14 @@
           <ColumnDefinition />
           <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Button Margin="50,5,50,5" Content="取消" />
         <Button
-          Grid.Column="1"
           Margin="50,5,50,5"
           Content="确定"
           Style="{StaticResource Button_WindowGlassBrush}" />
+        <Button
+          Grid.Column="1"
+          Margin="50,5,50,5"
+          Content="取消" />
       </Grid>
     </Grid>
   </Grid>

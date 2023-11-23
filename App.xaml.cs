@@ -22,11 +22,13 @@ public partial class App : Application
     private void App_Startup(object sender, StartupEventArgs e)
     {
         SetWindowGlassBrush();
-        var window = Ioc.Default.GetService<StartWindow>();
+        //var window = Ioc.Default.GetService<StartWindow>();
+        //window!.Show();
+        var window = Ioc.Default.GetService<MainWindow>();
         window!.Show();
     }
 
-    private void SetWindowGlassBrush()
+    private static void SetWindowGlassBrush()
     {
         // 设置主题色
         var windowGlassBrush = SystemParameters.WindowGlassBrush;
