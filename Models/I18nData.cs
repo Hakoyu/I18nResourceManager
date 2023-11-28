@@ -31,15 +31,14 @@ public partial class I18nData : ObservableObject
 
     partial void OnIdChanged(string? oldValue, string newValue)
     {
-        if (string.IsNullOrWhiteSpace(newValue))
-        {
-            _dialogService.ShowMessageBox(
-                MainWindowVM.Instance,
-                new() { Content = "Id不可为空", Icon = MessageBoxImage.Warning }
-            );
-            if (string.IsNullOrWhiteSpace(oldValue) is false)
-                Id = oldValue;
-        }
+        if (string.IsNullOrWhiteSpace(newValue) is false)
+            return;
+        _dialogService.ShowMessageBox(
+            MainWindowVM.Instance,
+            new() { Content = "Id不可为空", Icon = MessageBoxImage.Warning }
+        );
+        if (string.IsNullOrWhiteSpace(oldValue) is false)
+            Id = oldValue;
     }
 
     /// <summary>

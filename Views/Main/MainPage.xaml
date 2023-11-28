@@ -99,16 +99,7 @@
         </ListBox>
       </Grid>
     </Grid>
-    <Grid x:Name="Grid_DataEdit" Grid.Column="1">
-      <Grid.Style>
-        <Style TargetType="Grid">
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding SelectedItem, ElementName=ListBox_Datas}" Value="{x:Null}">
-              <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </Grid.Style>
+    <Grid Grid.Column="1" IsEnabled="{Binding SelectedItem, ElementName=ListBox_Datas, Converter={StaticResource NullToFalseConverter}}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" MinHeight="{Binding ActualHeight, ElementName=Grid_Search}">
           <!--  设置第一行最大高度只能为当前页面高度的一半  -->
@@ -168,8 +159,7 @@
         Height="10"
         HorizontalAlignment="Stretch"
         VerticalContentAlignment="Top"
-        Background="{StaticResource HoverColor}"
-        DragCompleted="GridSplitter_1_DragCompleted" />
+        Background="{StaticResource HoverColor}" />
       <Grid Grid.Row="2" Margin="5">
         <DataGrid
           x:Name="DataGrid_Datas"

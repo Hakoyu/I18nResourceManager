@@ -22,11 +22,11 @@
     </Grid.RowDefinitions>
     <Grid>
       <TextBox
+        x:Name="TextBox_Main"
         MinWidth="300"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
         pu:TextBoxHelper.Watermark="{Binding Watermark}"
-        Focusable="True"
         Text="{Binding Text}" />
     </Grid>
     <Grid Grid.Row="1">
@@ -36,14 +36,14 @@
       </Grid.ColumnDefinitions>
       <Button
         Margin="50,5,50,5"
-        Command="{Binding CancelCommand}"
-        Content="取消" />
-      <Button
-        Grid.Column="1"
-        Margin="50,5,50,5"
         Command="{Binding OKCommand}"
         Content="确定"
         Style="{StaticResource Button_WindowGlassBrush}" />
+      <Button
+        Grid.Column="1"
+        Margin="50,5,50,5"
+        Command="{Binding CancelCommand}"
+        Content="取消" />
     </Grid>
   </Grid>
 </pu:WindowX>

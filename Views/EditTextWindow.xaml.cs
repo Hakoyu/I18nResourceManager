@@ -23,5 +23,6 @@ internal partial class EditTextWindow : WindowX
     public EditTextWindow()
     {
         InitializeComponent();
+        TextBox_Main.Focus();
     }
 }

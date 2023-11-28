@@ -187,25 +187,6 @@ internal partial class MainPage : Page
         TextBox_EditText.SetBinding(TextBox.TextProperty, binding);
         TextBox_EditText.IsEnabled = true;
     }
-
-    private void GridSplitter_1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is not GridSplitter splitter)
-            return;
-        if (splitter.Margin.Bottom < 0)
-            return;
-    }
-
-    private void GridSplitter_1_DragCompleted(
-        object sender,
-        System.Windows.Controls.Primitives.DragCompletedEventArgs e
-    )
-    {
-        if (sender is not GridSplitter splitter)
-            return;
-        if (DataGrid_Datas.ActualHeight > 0)
-            return;
-    }
 }
 
 public class DataGridI18nColumn

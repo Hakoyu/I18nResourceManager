@@ -329,8 +329,8 @@ internal partial class MainPageVM : ObservableObject
         if (result is null)
             return;
         var window = Ioc.Default.GetService<LoadFilesWindowVM>()!;
-        _dialogService.Show(MainWindowVM.Instance, window);
-        //window.LoadFiles()
+        window.LoadFiles(result.Select(i => i.LocalPath));
+        _dialogService.ShowDialog(MainWindowVM.Instance, window);
     }
     #endregion
     #endregion

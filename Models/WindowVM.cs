@@ -5,6 +5,13 @@ using HKW.HKWUtils.Events;
 
 namespace I18nResourceManager.Models;
 
+/// <summary>
+/// 窗口视图模型
+/// <para>
+/// 包含窗口关闭事件
+/// </para>
+/// </summary>
+/// <typeparam name="T">类型</typeparam>
 public class WindowVM<T> : ObservableObject, IViewClosing, IViewClosed
     where T : WindowVM<T>
 {

@@ -68,7 +68,7 @@ public partial class LoadFilesWindow : WindowX
         if (sender is not DataGrid dataGrid)
             return;
         // 编辑框被选中时, CurrentCell会变为null, 无视
-        if (TextBox_EditText.IsKeyboardFocused)
+        if (TextBox_EditText.IsKeyboardFocused || GridSplitter_1.IsKeyboardFocused)
             return;
         // 为空或者选中到 Id 列时, 清空并禁用编辑框
         if (dataGrid.CurrentCell.Column is null || dataGrid.CurrentCell.Column.Header is "Id")

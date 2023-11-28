@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace WpfApp1.Styles;
+namespace I18nResourceManager.Styles;
 
 public partial class AppStyles : ResourceDictionary
 {
