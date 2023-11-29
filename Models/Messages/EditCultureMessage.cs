@@ -5,8 +5,8 @@ using System.Globalization;
 namespace I18nResourceManager.Models.Messages;
 
 internal class EditCultureMessage
-    : ValueChangedMessage<(string? OldCultureName, string? NewCultureName)>
+    : ValueChangedMessage<(SimpleCultureInfo? OldCultureInfo, SimpleCultureInfo? NewCultureInfo)>
 {
-    public EditCultureMessage(string? OldCultureName, string? NewCultureName)
-        : base((OldCultureName, NewCultureName)) { }
+    public EditCultureMessage(SimpleCultureInfo? OldCultureInfo, SimpleCultureInfo? NewCultureInfo)
+        : base((OldCultureInfo, NewCultureInfo)) { }
 }

@@ -21,26 +21,17 @@ public partial class I18nResource : ObservableObject
 
     public ObservableList<string> CultureNames { get; }
 
-    public I18nResource()
-        : this(string.Empty, cultureNames: new()) { }
-
-    public I18nResource(string name)
-        : this(name, cultureNames: new()) { }
-
-    public I18nResource(string name, string cultureName)
-        : this(name, cultureNames: new() { cultureName }) { }
-
     public I18nResource(string name, ObservableList<string> cultureNames)
     {
         Name = name;
         CultureNames = cultureNames;
-        CultureNames.ListChanged += CultureNames_ListChanged;
-        Datas.ListChanged += Datas_ListChanged;
         foreach (var cultureName in CultureNames)
         {
             foreach (var data in Datas)
                 data.Datas.Add(cultureName, new());
         }
+        CultureNames.ListChanged += CultureNames_ListChanged;
+        Datas.ListChanged += Datas_ListChanged;
     }
 
     private void Datas_ListChanged(NotifyListChangedEventArgs<I18nData> args)

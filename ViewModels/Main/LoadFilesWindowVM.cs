@@ -29,10 +29,31 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
     #region Property
 
     [ObservableProperty]
-    private ObservableList<DataFileInfo> _loadFileInfos = new();
+    private ObservableList<DataFileInfo> _allLoadFileInfo = new();
 
     [ObservableProperty]
-    private ObservableList<I18nData> _allDatas = new();
+    private ObservableList<I18nData> _allData = new();
+
+    [ObservableProperty]
+    private bool? _selectAll = false;
+
+    private int _selectedCount = 0;
+
+    partial void OnSelectAllChanging(bool? oldValue, bool? newValue)
+    {
+        if (newValue is true && AllLoadFileInfo.All(i => i.CanSelect))
+        {
+            foreach (var info in AllLoadFileInfo)
+                info.IsSelected = true;
+        }
+        else if (newValue is false)
+        {
+            foreach (var info in AllLoadFileInfo)
+                info.IsSelected = false;
+        }
+    }
+
+    private int _checkCount = 0;
     #endregion
 
     #region Command
@@ -51,7 +72,7 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
             try
             {
                 var fileInfo = GetFileInfo(file);
-                LoadFileInfos.Add(fileInfo);
+                AllLoadFileInfo.Add(fileInfo);
                 fileInfo.ValueChanged += FileInfo_ValueChanged;
                 LoadFile(fileInfo);
             }
@@ -82,25 +103,30 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
                     sender.Culture = oldValue;
                 return;
             }
-            if (Utils.GetCultureInfo(newValue) is null)
+            if (Utils.GetCultureInfo(newValue) is not CultureInfo cultureInfo)
             {
                 _dialogService.ShowMessageBox(this, $"无法识别文化 {newValue}");
                 return;
             }
             WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
-                new(oldValue, newValue),
+                new(new(oldValue), new(cultureInfo)),
                 MessageToken
             );
         }
         else if (e.PropertyName == nameof(DataFileInfo.IsSelected))
         {
             var (oldValue, newValue) = e.GetValue<bool>();
-            if (string.IsNullOrWhiteSpace(sender.Culture) is false)
-                return;
             if (newValue is false)
+            {
+                _selectedCount--;
                 return;
-            _dialogService.ShowMessageBox(this, $"文化为空, 无法选中");
-            sender.IsSelected = false;
+            }
+            if (sender.CanSelect is false)
+            {
+                _dialogService.ShowMessageBox(this, $"文化为空, 无法选中");
+                sender.IsSelected = false;
+            }
+            _selectedCount++;
         }
     }
 

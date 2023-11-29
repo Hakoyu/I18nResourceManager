@@ -30,34 +30,28 @@ public partial class LoadFilesWindow : WindowX
         WeakReferenceMessenger.Default.Register<EditCultureMessage, Guid>(
             this,
             LoadFilesWindowVM.MessageToken,
-            (s, e) =>
-            {
-                if (
-                    string.IsNullOrEmpty(e.Value.OldCultureName)
-                    && string.IsNullOrEmpty(e.Value.NewCultureName)
-                )
-                    throw new("???");
-                if (
-                    string.IsNullOrEmpty(e.Value.OldCultureName) is false
-                    && string.IsNullOrEmpty(e.Value.NewCultureName) is false
-                )
-                {
-                    var newCulture = CultureInfo.GetCultureInfo(e.Value.NewCultureName);
-                    var oldCulture = CultureInfo.GetCultureInfo(e.Value.OldCultureName);
-                    MainPage.ReplaceCulture(_dataGridI18nColumns, oldCulture, newCulture);
-                }
-                else if (string.IsNullOrEmpty(e.Value.NewCultureName) is false)
-                {
-                    var newCulture = CultureInfo.GetCultureInfo(e.Value.NewCultureName);
-                    MainPage.AddCulture(DataGrid_Datas, _dataGridI18nColumns, newCulture);
-                }
-                else if (string.IsNullOrEmpty(e.Value.OldCultureName) is false)
-                {
-                    var oldCulture = CultureInfo.GetCultureInfo(e.Value.OldCultureName);
-                    MainPage.RemoveCulture(DataGrid_Datas, _dataGridI18nColumns, oldCulture);
-                }
-            }
+            MessageHandler
         );
+    }
+
+    private void MessageHandler(object sender, EditCultureMessage message)
+    {
+        if (message.Value.OldCultureInfo is null && message.Value.NewCultureInfo is null)
+            throw new("???");
+        var oldInfo = message.Value.OldCultureInfo;
+        var newInfo = message.Value.NewCultureInfo;
+        if (oldInfo is not null && newInfo is not null)
+        {
+            MainPage.ReplaceCulture(_dataGridI18nColumns, oldInfo.Value, newInfo.Value);
+        }
+        else if (newInfo is not null)
+        {
+            MainPage.AddCulture(DataGrid_Datas, _dataGridI18nColumns, newInfo.Value);
+        }
+        else if (oldInfo is not null)
+        {
+            MainPage.RemoveCulture(DataGrid_Datas, _dataGridI18nColumns, oldInfo.Value);
+        }
     }
 
     private readonly Dictionary<string, DataGridI18nColumn> _dataGridI18nColumns = new();

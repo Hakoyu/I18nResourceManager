@@ -56,7 +56,7 @@
           x:Name="ListBox_Datas"
           d:ItemsSource="{d:SampleData ItemCount=5}"
           ItemContainerStyle="{x:Null}"
-          ItemsSource="{Binding I18nResources}"
+          ItemsSource="{Binding AllI18nResource}"
           ScrollViewer.IsDeferredScrollingEnabled="True"
           SelectedItem="{Binding CurrentI18nResource}"
           VirtualizingStackPanel.VirtualizationMode="Recycling">

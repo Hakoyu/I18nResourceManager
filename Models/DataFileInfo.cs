@@ -13,6 +13,7 @@ public partial class DataFileInfo : ViewModelBase<DataFileInfo>
     private string _filePath = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSelect))]
     private string _culture = string.Empty;
 
     [ObservableProperty]
@@ -20,4 +21,6 @@ public partial class DataFileInfo : ViewModelBase<DataFileInfo>
 
     [ObservableProperty]
     private ObservableList<I18nData> _datas = new();
+
+    public bool CanSelect => string.IsNullOrEmpty(Culture) is false;
 }

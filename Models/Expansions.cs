@@ -10,7 +10,7 @@ namespace I18nResourceManager.Models;
 
 public static class Expansions
 {
-    public static string GetFullInfo(this CultureInfo cultureInfo)
+    public static string GetFullName(this CultureInfo cultureInfo)
     {
         return $"{cultureInfo.DisplayName} [{cultureInfo.Name}]";
     }

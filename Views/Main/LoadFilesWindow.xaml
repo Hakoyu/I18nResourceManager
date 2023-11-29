@@ -32,7 +32,7 @@
           <ColumnDefinition />
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <CheckBox IsChecked="{x:Null}" IsThreeState="True" />
+        <CheckBox IsChecked="{Binding SelectAll}" IsThreeState="True" />
         <TextBox Grid.Column="1" d:Text="Search" />
         <ComboBox Grid.Column="2">
           <ComboBoxItem />
@@ -43,7 +43,7 @@
           x:Name="ListBox_Datas"
           d:ItemsSource="{d:SampleData ItemCount=5}"
           ItemContainerStyle="{x:Null}"
-          ItemsSource="{Binding LoadFileInfos}"
+          ItemsSource="{Binding AllLoadFileInfo}"
           ScrollViewer.IsDeferredScrollingEnabled="True"
           VirtualizingStackPanel.VirtualizationMode="Recycling">
           <ItemsControl.ItemTemplate>
@@ -53,7 +53,7 @@
                   <ColumnDefinition Width="Auto" />
                   <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <CheckBox IsChecked="{Binding IsSelected}" />
+                <CheckBox IsChecked="{Binding IsSelected}" IsEnabled="{Binding CanSelect}" />
                 <StackPanel Grid.Column="1">
                   <TextBox
                     HorizontalAlignment="Left"

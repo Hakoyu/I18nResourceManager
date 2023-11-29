@@ -46,29 +46,21 @@ internal partial class MainPage : Page
 
     private void MessageHandler(object sender, EditCultureMessage message)
     {
-        if (
-            string.IsNullOrEmpty(message.Value.OldCultureName)
-            && string.IsNullOrEmpty(message.Value.NewCultureName)
-        )
+        if (message.Value.OldCultureInfo is null && message.Value.NewCultureInfo is null)
             throw new("???");
-        if (
-            string.IsNullOrEmpty(message.Value.OldCultureName) is false
-            && string.IsNullOrEmpty(message.Value.NewCultureName) is false
-        )
+        var oldInfo = message.Value.OldCultureInfo;
+        var newInfo = message.Value.NewCultureInfo;
+        if (oldInfo is not null && newInfo is not null)
         {
-            var newCulture = CultureInfo.GetCultureInfo(message.Value.NewCultureName);
-            var oldCulture = CultureInfo.GetCultureInfo(message.Value.OldCultureName);
-            ReplaceCulture(_dataGridI18nColumns, oldCulture, newCulture);
+            ReplaceCulture(_dataGridI18nColumns, oldInfo.Value, newInfo.Value);
         }
-        else if (string.IsNullOrEmpty(message.Value.NewCultureName) is false)
+        else if (newInfo is not null)
         {
-            var newCulture = CultureInfo.GetCultureInfo(message.Value.NewCultureName);
-            AddCulture(DataGrid_Datas, _dataGridI18nColumns, newCulture);
+            AddCulture(DataGrid_Datas, _dataGridI18nColumns, newInfo.Value);
         }
-        else if (string.IsNullOrEmpty(message.Value.OldCultureName) is false)
+        else if (oldInfo is not null)
         {
-            var oldCulture = CultureInfo.GetCultureInfo(message.Value.OldCultureName);
-            RemoveCulture(DataGrid_Datas, _dataGridI18nColumns, oldCulture);
+            RemoveCulture(DataGrid_Datas, _dataGridI18nColumns, oldInfo.Value);
         }
     }
 
@@ -76,7 +68,7 @@ internal partial class MainPage : Page
 
     public const string ValueBindingFormat = "Datas[{0}].Value";
     public const string CommentBindingFormat = "Datas[{0}].Comment";
-    public const string CommentHeaderFormat = "{0} - Comment";
+    public const string CommentHeaderFormat = "{0}.Comment";
 
     /// <summary>
     /// 添加文化列
@@ -85,13 +77,13 @@ internal partial class MainPage : Page
     public static void AddCulture(
         DataGrid dataGrid,
         Dictionary<string, DataGridI18nColumn> i18nColumns,
-        CultureInfo culture
+        SimpleCultureInfo culture
     )
     {
         // 文化数据列
         var valueColumn = new DataGridTextColumn()
         {
-            Header = culture.GetFullInfo(),
+            Header = culture.FullName,
             Binding = new Binding(string.Format(ValueBindingFormat, culture.Name))
             {
                 Mode = BindingMode.TwoWay
@@ -100,7 +92,7 @@ internal partial class MainPage : Page
         // 文化数据注释列
         var commentColumn = new DataGridTextColumn()
         {
-            Header = string.Format(CommentHeaderFormat, culture.GetFullInfo()),
+            Header = string.Format(CommentHeaderFormat, culture.FullName),
             Binding = new Binding(string.Format(CommentBindingFormat, culture.Name))
             {
                 Mode = BindingMode.TwoWay
@@ -118,7 +110,7 @@ internal partial class MainPage : Page
     public static void RemoveCulture(
         DataGrid dataGrid,
         Dictionary<string, DataGridI18nColumn> i18nColumns,
-        CultureInfo culture
+        SimpleCultureInfo culture
     )
     {
         dataGrid.Columns.Remove(i18nColumns[culture.Name].Value);
@@ -133,19 +125,28 @@ internal partial class MainPage : Page
     /// <param name="newCulture"></param>
     public static void ReplaceCulture(
         Dictionary<string, DataGridI18nColumn> i18nColumns,
-        CultureInfo oldCulture,
-        CultureInfo newCulture
+        SimpleCultureInfo oldCulture,
+        SimpleCultureInfo newCulture
     )
     {
         //if (_dataGridI18nColumns.ContainsKey(newCultureName))
         //    throw new();
         var i18nColumn = i18nColumns[oldCulture.Name];
-        i18nColumn.Value.Header = newCulture.GetFullInfo();
-        i18nColumn.Value.Binding = new Binding(string.Format(ValueBindingFormat, newCulture.Name));
-        i18nColumn.Comment.Header = string.Format(CommentHeaderFormat, newCulture.GetFullInfo());
+        i18nColumn.Value.Header = newCulture.FullName;
+        i18nColumn.Value.Binding = new Binding(string.Format(ValueBindingFormat, newCulture.Name))
+        {
+            Mode = BindingMode.TwoWay
+        };
+
+        i18nColumn.Comment.Header = string.Format(CommentHeaderFormat, newCulture.FullName);
         i18nColumn.Comment.Binding = new Binding(
             string.Format(CommentBindingFormat, newCulture.Name)
-        );
+        )
+        {
+            Mode = BindingMode.TwoWay
+        };
+        ;
+
         i18nColumns.Remove(oldCulture.Name);
         i18nColumns.Add(newCulture.Name, i18nColumn);
     }
@@ -159,19 +160,20 @@ internal partial class MainPage : Page
         if (TextBox_EditText.IsKeyboardFocused || GridSplitter_1.IsKeyboardFocused)
             return;
         // 为空或者选中到 Id 列时, 清空并禁用编辑框
-        if (dataGrid.CurrentCell.Column is null || dataGrid.CurrentCell.Column.Header is "Id")
+        if (
+            dataGrid.CurrentCell.Column is null
+            || dataGrid.CurrentCell.Column.Header is nameof(I18nData.Id)
+        )
         {
             // 由于绑定到虚拟值会显示绑定失败, 则判断如果已经绑定到虚拟值就返回, 以此减少绑定失败的次数 (好像并没有什么用?)
             if (
                 BindingOperations.GetBinding(TextBox_EditText, TextBox.TextProperty)
-                    is Binding binding1
-                && binding1.Path.Path == "?"
+                    is Binding oldBinding
+                && oldBinding.Source is null
             )
                 return;
-            //BindingOperations.ClearBinding(TextBox_EditText, TextBlock.TextProperty);
-            //if (BindingOperations.IsDataBound(TextBox_EditText, TextBox.TextProperty))
             // 清除绑定后没有立刻生效, 故绑定一个虚拟值 (注意:此举会提示绑定错误)
-            TextBox_EditText.SetBinding(TextBox.TextProperty, "?");
+            TextBox_EditText.SetBinding(TextBox.TextProperty, nameof(string.Empty));
             TextBox_EditText.Text = string.Empty;
             TextBox_EditText.IsEnabled = false;
             return;

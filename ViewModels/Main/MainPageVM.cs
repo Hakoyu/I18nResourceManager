@@ -30,28 +30,12 @@ internal partial class MainPageVM : ObservableObject
     {
         CultureNames.ListChanged += CultureNames_ListChanged;
 
-        I18nResources.Add(new("Test"));
-        //CultureNames.Add("zh-CN");
-        //I18nResources.Add(new("Text1", CultureNames));
-        //CurrentI18nResource = I18nResources.First();
-        //CurrentI18nResource.Datas.Add(
-        //    new("bbb")
-        //    {
-        //        Datas = new()
-        //        {
-        //            ["zh-CN"] = new() { Value = "bbbText", Comment = "bbbComment" }
-        //        }
-        //    }
-        //);
-        //CurrentI18nResource.Datas.Add(
-        //    new("ccc")
-        //    {
-        //        Datas = new()
-        //        {
-        //            ["zh-CN"] = new() { Value = "cccText", Comment = "cccComment" }
-        //        }
-        //    }
-        //);
+        CultureNames.Add("zh");
+        CurrentI18nResource = new("Test", CultureNames);
+        CurrentI18nResource.Datas.Add(
+            new("TestKey") { Datas = new() { ["zh"] = new("TestValue", "TestComment") } }
+        );
+        AllI18nResource.Add(CurrentI18nResource);
     }
 
     /// <summary>
@@ -65,7 +49,7 @@ internal partial class MainPageVM : ObservableObject
             foreach (var cultureName in args.NewItems!)
             {
                 WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
-                    new(null, cultureName),
+                    new(null, new(cultureName)),
                     MessageToken
                 );
             }
@@ -75,7 +59,7 @@ internal partial class MainPageVM : ObservableObject
             foreach (var cultureName in args.OldItems!)
             {
                 WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
-                    new(cultureName, null),
+                    new(new(cultureName), null),
                     MessageToken
                 );
             }
@@ -85,7 +69,7 @@ internal partial class MainPageVM : ObservableObject
             var newCultureName = args.NewItems!.First();
             var oldCultureName = args.OldItems!.First();
             WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
-                new(oldCultureName, newCultureName),
+                new(new(oldCultureName), new(newCultureName)),
                 MessageToken
             );
         }
@@ -93,10 +77,10 @@ internal partial class MainPageVM : ObservableObject
 
     #region Property
     [ObservableProperty]
-    private I18nResource _currentI18nResource = new();
+    private I18nResource _currentI18nResource = new(string.Empty, new());
 
     [ObservableProperty]
-    private ObservableCollection<I18nResource> _i18nResources = new();
+    private ObservableCollection<I18nResource> _allI18nResource = new();
 
     [ObservableProperty]
     private IList<I18nData> _selectedI18nDatas = new ObservableCollection<I18nData>();
@@ -132,7 +116,7 @@ internal partial class MainPageVM : ObservableObject
             }
             else
             {
-                CurrentI18nResource.Datas.Add(new(i18nDataId));
+                CurrentI18nResource.Datas.Add(new(i18nDataId, CurrentI18nResource.CultureNames));
             }
         };
         _dialogService.ShowDialog(MainWindowVM.Instance, vm);
@@ -183,23 +167,15 @@ internal partial class MainPageVM : ObservableObject
                 e.Cancel = false;
                 return;
             }
-            else
+
+            if (Utils.GetCultureInfo(newCultureName) is null)
             {
-                try
-                {
-                    var culture = CultureInfo.GetCultureInfo(newCultureName);
-                }
-                catch
-                {
-                    _dialogService.ShowMessageBox(
-                        MainWindowVM.Instance,
-                        new() { Content = "未知的文化" }
-                    );
-                    e.Cancel = false;
-                    return;
-                }
-                CultureNames.Add(newCultureName);
+                _dialogService.ShowMessageBox(MainWindowVM.Instance, "未知的文化");
+                e.Cancel = false;
+                return;
             }
+
+            CultureNames.Add(newCultureName);
         };
         _dialogService.ShowDialog(MainWindowVM.Instance, vm);
     }
@@ -246,7 +222,7 @@ internal partial class MainPageVM : ObservableObject
                 return;
             }
 
-            if (I18nResources.Any(i => i.Name == newResourceName))
+            if (AllI18nResource.Any(i => i.Name == newResourceName))
             {
                 _dialogService.ShowMessageBox(MainWindowVM.Instance, "资源名已存在");
                 return;
@@ -255,7 +231,7 @@ internal partial class MainPageVM : ObservableObject
             {
                 if (resource is null)
                 {
-                    I18nResources.Add(new(newResourceName, CultureNames));
+                    AllI18nResource.Add(new(newResourceName, CultureNames));
                 }
                 else
                 {
@@ -281,7 +257,7 @@ internal partial class MainPageVM : ObservableObject
         );
         if (result is true)
         {
-            I18nResources.Remove(resource);
+            AllI18nResource.Remove(resource);
         }
     }
     #endregion
@@ -301,7 +277,7 @@ internal partial class MainPageVM : ObservableObject
             return;
         try
         {
-            foreach (var resource in I18nResources)
+            foreach (var resource in AllI18nResource)
             {
                 resource.SaveTo(result.LocalPath);
             }

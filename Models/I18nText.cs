@@ -27,18 +27,4 @@ public partial class I18nText : ObservableObject
         Value = value;
         Comment = comment;
     }
-
-    public static IEnumerable<I18nText> GetCustomers(int count, int seed = 114514)
-    {
-        var faker = new Faker<I18nText>()
-            .UseSeed(seed)
-            .RuleFor(p => p.Value, f => f.Name.FirstName())
-            .RuleFor(p => p.Comment, f => f.Name.FullName());
-        return faker.Generate(count);
-        //Randomizer.Seed = new Random(seed);
-        //var faker = new Faker<TestData>()
-        //    .RuleFor(p => p.Id, Guid.NewGuid().ToString())
-        //    .RuleFor(p => p.Name, f => f.Name.FirstName());
-        //return faker.Generate(count);
-    }
 }
