@@ -10,6 +10,7 @@ using HKW.HKWTOML;
 using HKW.HKWTOML.Serializer;
 using I18nResourceManager.ViewModels.Main;
 using HKW.HKWTOML.Deserializer;
+using HKW.HKWUtils.Observable;
 
 namespace I18nResourceManager.ViewModels;
 

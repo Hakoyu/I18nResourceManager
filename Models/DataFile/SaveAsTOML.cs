@@ -21,13 +21,13 @@ internal class SaveAsTOML : IDataFileSave
             {
                 toml.Add(
                     data.Id,
-                    new TomlString(data.Datas[cultureName].Value)
+                    new TomlString(data.Texts[cultureName].Value)
                     {
-                        Comment = data.Datas[cultureName].Comment
+                        Comment = data.Texts[cultureName].Comment
                     }
                 );
             }
-            toml.SaveToFile(Path.Combine(resourcePath, $"{cultureName}.toml"));
+            toml.SaveToFile(Path.Combine(resourcePath, cultureName));
         }
     }
 }

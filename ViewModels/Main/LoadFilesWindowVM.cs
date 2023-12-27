@@ -11,6 +11,8 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.Messaging;
 using I18nResourceManager.Models.Messages;
 using HKW.HKWViewModels;
+using HKW.HKWUtils.Observable;
+using HKW.HKWUtils;
 
 namespace I18nResourceManager.ViewModels.Main;
 
@@ -24,36 +26,45 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
 
     private readonly IDialogService _dialogService = Ioc.Default.GetService<IDialogService>()!;
 
-    public LoadFilesWindowVM() { }
-
-    #region Property
-
-    [ObservableProperty]
-    private ObservableList<DataFileInfo> _allLoadFileInfo = new();
-
-    [ObservableProperty]
-    private ObservableList<I18nData> _allData = new();
-
-    [ObservableProperty]
-    private bool? _selectAll = false;
-
-    private int _selectedCount = 0;
-
-    partial void OnSelectAllChanging(bool? oldValue, bool? newValue)
+    public LoadFilesWindowVM()
     {
-        if (newValue is true && AllLoadFileInfo.All(i => i.CanSelect))
+#if DEBUG
+        foreach (var info in DataFileInfo.GetFakeDatas("zh"))
         {
-            foreach (var info in AllLoadFileInfo)
-                info.IsSelected = true;
+            info.ValueChanged += FileInfo_ValueChanged;
+            LoadFileInfos.Add(info);
         }
-        else if (newValue is false)
-        {
-            foreach (var info in AllLoadFileInfo)
-                info.IsSelected = false;
-        }
+#endif
     }
 
-    private int _checkCount = 0;
+    #region Property
+    [ObservableProperty]
+    private CheckGroup _checkGroup = new();
+
+    [ObservableProperty]
+    private ObservableList<DataFileInfo> _loadFileInfos = new();
+
+    [ObservableProperty]
+    private DataFileInfo _cultureLoadFileInfo = new();
+
+    [ObservableProperty]
+    private ObservableList<I18nData> _datas = new();
+
+    partial void OnCultureLoadFileInfoChanged(DataFileInfo? oldValue, DataFileInfo newValue)
+    {
+        //FileInfo_ValueChanged(
+        //    newValue,
+        //    new(nameof(DataFileInfo.Culture), oldValue!.Culture, newValue.Culture)
+        //);
+        SimpleCultureInfo? oldInfo = null;
+        if (string.IsNullOrWhiteSpace(oldValue?.Culture) is false)
+            oldInfo = new(oldValue?.Culture!);
+        WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
+            new(oldInfo, new(newValue?.Culture!)),
+            MessageToken
+        );
+    }
+
     #endregion
 
     #region Command
@@ -61,6 +72,12 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
     private void Cancel()
     {
         _dialogService.Close(this);
+    }
+
+    [RelayCommand]
+    private void CheckAllFailed()
+    {
+        _dialogService.ShowMessageBox(this, "全选失败\n有无法选中的项目");
     }
     #endregion
 
@@ -72,8 +89,6 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
             try
             {
                 var fileInfo = GetFileInfo(file);
-                AllLoadFileInfo.Add(fileInfo);
-                fileInfo.ValueChanged += FileInfo_ValueChanged;
                 LoadFile(fileInfo);
             }
             catch
@@ -91,7 +106,7 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
         }
     }
 
-    private void FileInfo_ValueChanged(DataFileInfo sender, ValueChangedEventArgs e)
+    private void FileInfo_ValueChanged(DataFileInfo sender, PropertyValueChangedEventArgs e)
     {
         if (e.PropertyName == nameof(DataFileInfo.Culture))
         {
@@ -99,34 +114,22 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
             if (string.IsNullOrWhiteSpace(newValue))
             {
                 _dialogService.ShowMessageBox(this, "文化不能为空");
-                if (string.IsNullOrWhiteSpace(oldValue) is false)
-                    sender.Culture = oldValue;
+                e.Cancel = true;
                 return;
             }
-            if (Utils.GetCultureInfo(newValue) is not CultureInfo cultureInfo)
+            if (CultureUtils.TryGetCultureInfo(newValue, out var cultureInfo) is false)
             {
                 _dialogService.ShowMessageBox(this, $"无法识别文化 {newValue}");
+                e.Cancel = true;
                 return;
             }
+            SimpleCultureInfo? oldInfo = null;
+            if (string.IsNullOrWhiteSpace(oldValue) is false)
+                oldInfo = new(oldValue);
             WeakReferenceMessenger.Default.Send<EditCultureMessage, Guid>(
-                new(new(oldValue), new(cultureInfo)),
+                new(oldInfo, new(cultureInfo)),
                 MessageToken
             );
-        }
-        else if (e.PropertyName == nameof(DataFileInfo.IsSelected))
-        {
-            var (oldValue, newValue) = e.GetValue<bool>();
-            if (newValue is false)
-            {
-                _selectedCount--;
-                return;
-            }
-            if (sender.CanSelect is false)
-            {
-                _dialogService.ShowMessageBox(this, $"文化为空, 无法选中");
-                sender.IsSelected = false;
-            }
-            _selectedCount++;
         }
     }
 
@@ -145,7 +148,9 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
 
     private void LoadFile(DataFileInfo fileInfo)
     {
-        if (fileInfo.FilePath.EndsWith(TOML.TOMLExtension))
+        LoadFileInfos.Add(fileInfo);
+        fileInfo.ValueChanged += FileInfo_ValueChanged;
+        if (fileInfo.FilePath.EndsWith(TOML.ExtensionName))
             LoadTomlFile(fileInfo);
     }
 
@@ -153,6 +158,6 @@ internal partial class LoadFilesWindowVM : DialogWindowVM<LoadFilesWindowVM>
     {
         var toml = TOML.ParseFromFile(fileInfo.FilePath);
         foreach (var item in toml)
-            fileInfo.Datas.Add(new(item.Key) { Datas = new() });
+            fileInfo.Datas.Add(new(item.Key));
     }
 }

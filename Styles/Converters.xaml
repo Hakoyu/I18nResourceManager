@@ -3,8 +3,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:c="clr-namespace:ValueConverters;assembly=ValueConverters"
   xmlns:h="https://hkw.com/wpf">
-  <c:NullToBoolConverter x:Key="NullToFalseConverter" IsInverted="True" />
-  <h:IsBoolConverter x:Key="IsTrueConverter" />
+  <c:NullToBoolConverter x:Key="NullToFalse" IsInverted="True" />
   <c:BoolInverter x:Key="BoolInverter" />
-  <h:CalculatorConverter x:Key="CalculatorConverter" />
+  <h:CalculatorConverter x:Key="Calculator" />
+  <h:IsBoolConverter x:Key="IsTrue" />
 </ResourceDictionary>

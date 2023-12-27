@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using HKW.HKWUtils.Collections;
+using HKW.HKWUtils.Observable;
 using Panuon.WPF.UI;
 using System;
 using System.Collections.Generic;

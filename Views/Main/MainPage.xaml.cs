@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using HKW.HKWUtils.Collections;
+using HKW.WPF.Converters;
 using I18nResourceManager.Models;
 using I18nResourceManager.Models.Messages;
 using I18nResourceManager.ViewModels.Main;
+using Panuon.WPF.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -66,9 +68,58 @@ internal partial class MainPage : Page
 
     private readonly Dictionary<string, DataGridI18nColumn> _dataGridI18nColumns = new();
 
-    public const string ValueBindingFormat = "Datas[{0}].Value";
-    public const string CommentBindingFormat = "Datas[{0}].Comment";
+    public const string ValueBindingFormat = "Texts[{0}].Value";
+    public const string CommentBindingFormat = "Texts[{0}].Comment";
+    public const string SearchValueBindingFormat = "SearchTexts[{0}].Value";
+    public const string SearchCommentBindingFormat = "SearchTexts[{0}].Comment";
     public const string CommentHeaderFormat = "{0}.Comment";
+
+    public static object CreateHeader(Binding binding, string name, string searchBindingPath)
+    {
+        var panel = new DockPanel();
+        panel.SetBinding(DataContextProperty, binding);
+        var nameTextBlock = new TextBlock()
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            Text = name
+        };
+        panel.Children.Add(nameTextBlock);
+
+        var searchTextBox = new TextBox()
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Padding = new(0, 5, 0, 5),
+            Margin = new(5, 0, 5, 0)
+        };
+        DockPanel.SetDock(searchTextBox, Dock.Right);
+        searchTextBox.SetBinding(
+            TextBox.TextProperty,
+            new Binding(searchBindingPath)
+            {
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            }
+        );
+        TextBoxHelper.SetWatermark(searchTextBox, "🔍");
+        WatermarkHelper.SetMargin(searchTextBox, new(0));
+        panel.Children.Add(searchTextBox);
+        return panel;
+    }
+
+    public static void UpdateHeader(object header, string name, string searchBindingPath)
+    {
+        if (header is not StackPanel sp)
+            throw new Exception("???");
+        var nameTextBlock = (TextBlock)sp.Children[0];
+        var searchTextBox = (TextBox)sp.Children[1];
+        nameTextBlock.Text = name;
+        searchTextBox.SetBinding(
+            TextBox.TextProperty,
+            new Binding(searchBindingPath)
+            {
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            }
+        );
+    }
 
     /// <summary>
     /// 添加文化列
@@ -83,20 +134,28 @@ internal partial class MainPage : Page
         // 文化数据列
         var valueColumn = new DataGridTextColumn()
         {
-            Header = culture.FullName,
+            Header = CreateHeader(
+                new Binding(nameof(LoadFilesWindowVM.CultureLoadFileInfo))
+                {
+                    Source = dataGrid.DataContext
+                },
+                culture.FullName,
+                string.Format(SearchValueBindingFormat, culture.Name)
+            ),
             Binding = new Binding(string.Format(ValueBindingFormat, culture.Name))
-            {
-                Mode = BindingMode.TwoWay
-            }
         };
         // 文化数据注释列
         var commentColumn = new DataGridTextColumn()
         {
-            Header = string.Format(CommentHeaderFormat, culture.FullName),
+            Header = CreateHeader(
+                new Binding(nameof(LoadFilesWindowVM.CultureLoadFileInfo))
+                {
+                    Source = dataGrid.DataContext
+                },
+                string.Format(CommentHeaderFormat, culture.FullName),
+                string.Format(SearchCommentBindingFormat, culture.Name)
+            ),
             Binding = new Binding(string.Format(CommentBindingFormat, culture.Name))
-            {
-                Mode = BindingMode.TwoWay
-            }
         };
         dataGrid.Columns.Add(valueColumn);
         dataGrid.Columns.Add(commentColumn);
@@ -113,9 +172,10 @@ internal partial class MainPage : Page
         SimpleCultureInfo culture
     )
     {
-        dataGrid.Columns.Remove(i18nColumns[culture.Name].Value);
-        dataGrid.Columns.Remove(i18nColumns[culture.Name].Comment);
-        i18nColumns.Remove(culture.Name);
+        if (i18nColumns.Remove(culture.Name, out var column) is false)
+            return;
+        dataGrid.Columns.Remove(column.Value);
+        dataGrid.Columns.Remove(column.Comment);
     }
 
     /// <summary>
@@ -129,26 +189,25 @@ internal partial class MainPage : Page
         SimpleCultureInfo newCulture
     )
     {
-        //if (_dataGridI18nColumns.ContainsKey(newCultureName))
-        //    throw new();
-        var i18nColumn = i18nColumns[oldCulture.Name];
-        i18nColumn.Value.Header = newCulture.FullName;
-        i18nColumn.Value.Binding = new Binding(string.Format(ValueBindingFormat, newCulture.Name))
-        {
-            Mode = BindingMode.TwoWay
-        };
+        if (oldCulture.Name == newCulture.Name)
+            return;
+        if (i18nColumns.Remove(oldCulture.Name, out var column) is false)
+            return;
+        UpdateHeader(
+            column.Value.Header,
+            newCulture.FullName,
+            string.Format(SearchValueBindingFormat, newCulture.Name)
+        );
+        column.Value.Binding = new Binding(string.Format(ValueBindingFormat, newCulture.Name));
 
-        i18nColumn.Comment.Header = string.Format(CommentHeaderFormat, newCulture.FullName);
-        i18nColumn.Comment.Binding = new Binding(
-            string.Format(CommentBindingFormat, newCulture.Name)
-        )
-        {
-            Mode = BindingMode.TwoWay
-        };
-        ;
+        UpdateHeader(
+            column.Comment.Header,
+            string.Format(CommentHeaderFormat, newCulture.FullName),
+            string.Format(SearchCommentBindingFormat, newCulture.Name)
+        );
+        column.Comment.Binding = new Binding(string.Format(CommentBindingFormat, newCulture.Name));
 
-        i18nColumns.Remove(oldCulture.Name);
-        i18nColumns.Add(newCulture.Name, i18nColumn);
+        i18nColumns.Add(newCulture.Name, column);
     }
 
     private void DataGrid_Datas_CurrentCellChanged(object sender, EventArgs e)
@@ -193,10 +252,8 @@ internal partial class MainPage : Page
 
 public class DataGridI18nColumn
 {
-    public DataGridTextColumn Value { get; set; } = null!;
-    public DataGridTextColumn Comment { get; set; } = null!;
-
-    public DataGridI18nColumn() { }
+    public DataGridTextColumn Value { get; }
+    public DataGridTextColumn Comment { get; }
 
     public DataGridI18nColumn(DataGridTextColumn value, DataGridTextColumn comment)
     {

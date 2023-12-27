@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HKW.HKWUtils.Collections;
+using HKW.HKWUtils.Observable;
 using I18nResourceManager.ViewModels.Main;
 using Microsoft.Extensions.Logging;
 using System;
@@ -19,48 +20,50 @@ namespace I18nResourceManager.Models;
 /// </summary>
 public partial class I18nData : ObservableObject
 {
-    private static readonly ILogger<I18nData> _logger = Ioc.Default
-        .GetService<ILoggerFactory>()!
-        .CreateLogger<I18nData>();
-
-    private static readonly IDialogService _dialogService =
-        Ioc.Default.GetService<IDialogService>()!;
-
+    /// <summary>
+    /// ID
+    /// </summary>
     [ObservableProperty]
-    private string _id = string.Empty;
-
-    partial void OnIdChanged(string? oldValue, string newValue)
-    {
-        if (string.IsNullOrWhiteSpace(newValue) is false)
-            return;
-        _dialogService.ShowMessageBox(
-            MainWindowVM.Instance,
-            new() { Content = "Id不可为空", Icon = MessageBoxImage.Warning }
-        );
-        if (string.IsNullOrWhiteSpace(oldValue) is false)
-            Id = oldValue;
-    }
+    private string _id;
 
     /// <summary>
-    /// 值
+    /// 文本
     /// <para>
     /// (CultureName, I18nText)
     /// </para>
     /// </summary>
     [ObservableProperty]
-    ObservableDictionary<string, I18nText> _datas = new();
+    ObservableDictionary<string, I18nText> _texts = new();
 
+    /// <inheritdoc/>
+    /// <param name="id">ID</param>
     public I18nData(string id)
     {
         Id = id;
     }
 
+    /// <inheritdoc/>
+    /// <param name="id">ID</param>
+    /// <param name="cultureNames">文化名称</param>
     public I18nData(string id, IEnumerable<string> cultureNames)
+        : this(id)
     {
-        Id = id;
         foreach (string cultureName in cultureNames)
+            Texts.Add(cultureName, new(cultureName));
+    }
+
+    public static IEnumerable<I18nData> GetFakeDatas(int count = 10, params string[] cultureNames)
+    {
+        var faker = new Faker();
+        for (int i = 0; i < count; i++)
         {
-            Datas.Add(cultureName, new());
+            var data = new I18nData(faker.Name.FirstName());
+            data.Texts = new(
+                cultureNames
+                    .Zip(cultureNames.Select(c => I18nText.GetFakeDatas(data.Id, c).First()))
+                    .ToDictionary(v => v.First, v => v.Second)
+            );
+            yield return data;
         }
     }
 }

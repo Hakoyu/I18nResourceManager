@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HKW.HKWUtils.Collections;
+using HKW.HKWUtils.Observable;
 using I18nResourceManager.Models;
 using I18nResourceManager.Models.Messages;
 using Microsoft.Extensions.Logging;
@@ -29,20 +30,24 @@ internal partial class MainPageVM : ObservableObject
     public MainPageVM()
     {
         CultureNames.ListChanged += CultureNames_ListChanged;
-
+#if DEBUG
         CultureNames.Add("zh");
         CurrentI18nResource = new("Test", CultureNames);
         CurrentI18nResource.Datas.Add(
-            new("TestKey") { Datas = new() { ["zh"] = new("TestValue", "TestComment") } }
+            new("TestKey") { Texts = new() { ["zh"] = new("zh", "TestValue", "TestComment") } }
         );
         AllI18nResource.Add(CurrentI18nResource);
+#endif
     }
 
     /// <summary>
     /// 当文化列表改变时 通知前台和资源做出响应
     /// </summary>
     /// <param name="args"></param>
-    private void CultureNames_ListChanged(NotifyListChangedEventArgs<string> args)
+    private void CultureNames_ListChanged(
+        IObservableList<string> sender,
+        NotifyListChangedEventArgs<string> args
+    )
     {
         if (args.Action is ListChangeAction.Add)
         {
@@ -294,19 +299,22 @@ internal partial class MainPageVM : ObservableObject
     [RelayCommand]
     private void LoadFiles()
     {
-        var result = _dialogService.ShowOpenFilesDialog(
-            MainWindowVM.Instance,
-            new()
-            {
-                Title = "载入文件",
-                Filters = new() { new("TOML文件", "toml"), new("所有文件", "*") }
-            }
-        );
-        if (result is null)
-            return;
         var window = Ioc.Default.GetService<LoadFilesWindowVM>()!;
-        window.LoadFiles(result.Select(i => i.LocalPath));
         _dialogService.ShowDialog(MainWindowVM.Instance, window);
+
+        //var result = _dialogService.ShowOpenFilesDialog(
+        //    MainWindowVM.Instance,
+        //    new()
+        //    {
+        //        Title = "载入文件",
+        //        Filters = new() { new("TOML文件", "toml"), new("所有文件", "*") }
+        //    }
+        //);
+        //if (result is not null)
+        //    return;
+        //var window = Ioc.Default.GetService<LoadFilesWindowVM>()!;
+        //window.LoadFiles(result.Select(i => i.LocalPath));
+        //_dialogService.ShowDialog(MainWindowVM.Instance, window);
     }
     #endregion
     #endregion

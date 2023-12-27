@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HKW.HKWUtils;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -33,8 +34,10 @@ public struct SimpleCultureInfo
     }
 
     public SimpleCultureInfo(string cultureName)
+        : this()
     {
-        var cultureInfo = CultureInfo.GetCultureInfo(cultureName);
+        if (CultureUtils.TryGetCultureInfo(cultureName, out var cultureInfo) is false)
+            return;
         Name = cultureInfo.Name;
         FullName = cultureInfo.GetFullName();
     }

@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using HanumanInstitute.MvvmDialogs;
 using System.ComponentModel;
-using HKW.HKWUtils.Events;
 
 namespace I18nResourceManager.Models;
 
@@ -27,24 +26,23 @@ public class WindowVM<T> : ObservableObject, IViewClosing, IViewClosed
         if (AsyncClosing is null)
             return;
         foreach (
-            var asyncEvent in AsyncClosing
-                .GetInvocationList()
-                .Cast<XAsyncEventHandler<T, CancelEventArgs>>()
+            var asyncEvent in AsyncClosing.GetInvocationList().Cast<ClosingAsyncEventHandler<T>>()
         )
-        {
-            if (asyncEvent is not null)
-                await asyncEvent((T)this, e);
-        }
+            await asyncEvent((T)this, e);
         if (e.Cancel)
             return;
     }
 
     public void OnClosed()
     {
-        Closed?.Invoke((T)this);
+        Closed?.Invoke((T)this, new());
     }
 
-    public event XEventHandler<T>? Closed;
-    public event XEventHandler<T, CancelEventArgs>? Closing;
-    public event XAsyncEventHandler<T, CancelEventArgs>? AsyncClosing;
+    public event ClosedEventHandler<T>? Closed;
+    public event ClosingEventHandler<T>? Closing;
+    public event ClosingAsyncEventHandler<T>? AsyncClosing;
 }
+
+public delegate void ClosedEventHandler<T>(T shender, EventArgs e);
+public delegate void ClosingEventHandler<T>(T shender, CancelEventArgs e);
+public delegate Task ClosingAsyncEventHandler<T>(T shender, CancelEventArgs e);

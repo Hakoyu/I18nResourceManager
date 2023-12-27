@@ -32,7 +32,10 @@
           <ColumnDefinition />
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <CheckBox IsChecked="{Binding SelectAll}" IsThreeState="True" />
+        <CheckBox
+          x:Name="CheckBox_Leader"
+          IsChecked="{Binding CheckGroup.LeaderIsChecked}"
+          IsThreeState="True" />
         <TextBox Grid.Column="1" d:Text="Search" />
         <ComboBox Grid.Column="2">
           <ComboBoxItem />
@@ -43,12 +46,13 @@
           x:Name="ListBox_Datas"
           d:ItemsSource="{d:SampleData ItemCount=5}"
           ItemContainerStyle="{x:Null}"
-          ItemsSource="{Binding AllLoadFileInfo}"
+          ItemsSource="{Binding LoadFileInfos}"
           ScrollViewer.IsDeferredScrollingEnabled="True"
+          SelectedItem="{Binding CultureLoadFileInfo}"
           VirtualizingStackPanel.VirtualizationMode="Recycling">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
-              <Grid Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}">
+              <Grid>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="Auto" />
                   <ColumnDefinition />
@@ -78,12 +82,12 @@
         <RowDefinition />
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
-      <Grid h:ElementHelper.IsEnabled="{Binding SelectedItem.IsSelected, ElementName=ListBox_Datas, Converter={StaticResource IsTrueConverter}}" IsEnabled="False">
+      <Grid h:ElementHelper.IsEnabled="{Binding SelectedItem.IsSelected, ElementName=ListBox_Datas, Converter={StaticResource IsTrue}}" IsEnabled="False">
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" MinHeight="{Binding ActualHeight, ElementName=Grid_Search}">
             <!--  设置第一行最大高度只能为当前页面高度的一半  -->
             <RowDefinition.MaxHeight>
-              <MultiBinding Converter="{StaticResource CalculatorConverter}" ConverterParameter="/">
+              <MultiBinding Converter="{StaticResource Calculator}" ConverterParameter="/">
                 <Binding ElementName="Grid_Main" Path="ActualHeight" />
                 <Binding Source="2" />
               </MultiBinding>
@@ -113,42 +117,18 @@
             CanUserAddRows="False"
             CanUserReorderColumns="False"
             CurrentCellChanged="DataGrid_Datas_CurrentCellChanged"
-            ItemsSource="{Binding SelectedItem.Datas, ElementName=ListBox_Datas}"
+            ItemsSource="{Binding SelectedItem.ShowDatas, ElementName=ListBox_Datas}"
             ScrollViewer.IsDeferredScrollingEnabled="True"
             VirtualizingStackPanel.VirtualizationMode="Recycling">
-            <DataGrid.ColumnHeaderStyle>
-              <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="DataGridColumnHeader">
-                <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}" />
-                <Setter Property="ContextMenu">
-                  <Setter.Value>
-                    <ContextMenu>
-                      <MenuItem
-                        Command="{Binding PlacementTarget.Tag.EditCultureCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"
-                        CommandParameter="{Binding}"
-                        Header="编辑文化" />
-                      <MenuItem
-                        Command="{Binding PlacementTarget.Tag.RemoveCultureCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"
-                        CommandParameter="{Binding}"
-                        Header="删除文化" />
-                    </ContextMenu>
-                  </Setter.Value>
-                </Setter>
-                <Style.Triggers>
-                  <Trigger Property="Content" Value="Id">
-                    <Setter Property="ContextMenu" Value="{x:Null}" />
-                  </Trigger>
-                </Style.Triggers>
-              </Style>
-            </DataGrid.ColumnHeaderStyle>
             <DataGrid.RowStyle>
               <Style TargetType="DataGridRow">
-                <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}" />
+                <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}" />
                 <Setter Property="ContextMenu">
                   <Setter.Value>
                     <ContextMenu>
-                      <MenuItem Command="{Binding PlacementTarget.Tag.RemoveI18nDataCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" Header="删除" />
+                      <MenuItem Command="{Binding PlacementTarget.Tag.RemoveI18nDataCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Header="删除" />
                       <!--<MenuItem
-                  Command="{Binding PlacementTarget.Tag.RemoveCultureCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"
+                  Command="{Binding PlacementTarget.Tag.RemoveCultureCommand, RelativeSource={RelativeSource  AncestorType=ContextMenu}}"
                   CommandParameter="{Binding}"
                   Header="删除文化" />-->
                     </ContextMenu>
@@ -156,8 +136,41 @@
                 </Setter>
               </Style>
             </DataGrid.RowStyle>
+            <!--<DataGrid.ColumnHeaderStyle>
+              <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="DataGridColumnHeader">
+                <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}" />
+                <Setter Property="ContextMenu">
+                  <Setter.Value>
+                    <ContextMenu>
+                      <MenuItem
+                        Command="{Binding PlacementTarget.Tag.EditCultureCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                        CommandParameter="{Binding}"
+                        Header="编辑文化" />
+                      <MenuItem
+                        Command="{Binding PlacementTarget.Tag.RemoveCultureCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                        CommandParameter="{Binding}"
+                        Header="删除文化" />
+                    </ContextMenu>
+                  </Setter.Value>
+                </Setter>
+              </Style>
+            </DataGrid.ColumnHeaderStyle>-->
             <DataGrid.Columns>
-              <DataGridTextColumn Binding="{Binding Id}" Header="Id" />
+              <DataGridTextColumn Binding="{Binding Id}">
+                <DataGridTextColumn.Header>
+                  <DockPanel DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
+                    <TextBlock VerticalAlignment="Center" Text="Id" />
+                    <TextBox
+                      Margin="5,0,5,0"
+                      Padding="0,5,0,5"
+                      HorizontalAlignment="Center"
+                      pu:TextBoxHelper.Watermark="🔍"
+                      pu:WatermarkHelper.Margin="0"
+                      DockPanel.Dock="Right"
+                      Text="{Binding CultureLoadFileInfo.SearchId, UpdateSourceTrigger=PropertyChanged, Source={x:Null}}" />
+                  </DockPanel>
+                </DataGridTextColumn.Header>
+              </DataGridTextColumn>
             </DataGrid.Columns>
           </DataGrid>
         </Grid>
@@ -167,6 +180,14 @@
           <ColumnDefinition />
           <ColumnDefinition />
         </Grid.ColumnDefinitions>
+        <Button
+          Margin="50,5,50,5"
+          Content="确定"
+          Style="{StaticResource Button_WindowGlassBrush}" />
+        <Button
+          Margin="50,5,50,5"
+          Content="确定"
+          Style="{StaticResource Button_WindowGlassBrush}" />
         <Button
           Margin="50,5,50,5"
           Content="确定"

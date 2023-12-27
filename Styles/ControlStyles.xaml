@@ -160,7 +160,8 @@
     <Setter Property="Background" Value="{x:Null}" />
     <Setter Property="BorderBrush" Value="{x:Null}" />
     <Setter Property="BorderThickness" Value="1,1,1,1" />
-    <Setter Property="pu:LabelHelper.CornerRadius" Value="2,2,2,2" />
+    <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Mode=Self}}" />
+    <Setter Property="pu:LabelHelper.CornerRadius" Value="4" />
   </Style>
 
   <Style BasedOn="{StaticResource {x:Static pu:StyleKeys.TextBoxStyle}}" TargetType="TextBox">
@@ -173,6 +174,7 @@
     <Setter Property="pu:TextBoxHelper.FocusedBackground" Value="{x:Null}" />
     <Setter Property="BorderBrush" Value="{DynamicResource G_WindowGlassBrush}" />
     <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Mode=Self}}" />
     <Setter Property="pu:TextBoxHelper.CornerRadius" Value="4,4,4,4" />
     <Setter Property="pu:TextBoxHelper.HoverBorderBrush" Value="{DynamicResource G_WindowGlassBrush}" />
     <Setter Property="pu:TextBoxHelper.HoverBorderThickness" Value="0,0,0,1" />
@@ -193,6 +195,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource G_WindowGlassBrush}" />
     <Setter Property="BorderThickness" Value="0,0,0,1" />
     <Setter Property="FontSize" Value="{DynamicResource BodyFontSize}" />
+    <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Mode=Self}}" />
     <Setter Property="pu:PasswordBoxHelper.HoverBackground" Value="{x:Null}" />
     <Setter Property="pu:PasswordBoxHelper.FocusedBackground" Value="{x:Null}" />
     <Setter Property="pu:PasswordBoxHelper.CornerRadius" Value="4,4,4,4" />

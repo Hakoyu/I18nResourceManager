@@ -18,20 +18,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Bogus" Version="34.0.2" />
+		<PackageReference Include="Bogus" Version="35.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Emoji.Wpf" Version="0.3.4" />
 		<PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.0.0" />
 		<PackageReference Include="HanumanInstitute.MvvmDialogs.Wpf" Version="2.0.0" />
-		<PackageReference Include="HKW.TOML" Version="1.3.1" />
-		<PackageReference Include="HKW.Utils" Version="0.2.3" />
-		<PackageReference Include="HKW.ViewModels" Version="0.6.7" />
-		<PackageReference Include="HKW.WPF" Version="0.1.8" />
+		<PackageReference Include="HKW.TOML" Version="2.0.0" />
+		<PackageReference Include="HKW.Utils" Version="0.4.5" />
+		<PackageReference Include="HKW.ViewModels" Version="0.7.5" />
+		<PackageReference Include="HKW.WPF" Version="0.3.5" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
-		<PackageReference Include="NLog.Extensions.Logging" Version="5.3.5" />
-		<PackageReference Include="Panuon.WPF.UI" Version="1.1.16.3" />
+		<PackageReference Include="NLog.Extensions.Logging" Version="5.3.7" />
+		<PackageReference Include="Panuon.WPF.UI" Version="1.1.16.5" />
 		<PackageReference Include="SmartFormat" Version="3.3.0" />
 		<PackageReference Include="ValueConverters" Version="3.0.26" />
 	</ItemGroup>

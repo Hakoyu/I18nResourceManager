@@ -24,7 +24,7 @@ public partial class App : Application
         SetWindowGlassBrush();
         //var window = Ioc.Default.GetService<StartWindow>();
         //window!.Show();
-        var window = Ioc.Default.GetService<MainWindow>();
+        var window = Ioc.Default.GetService<LoadFilesWindow>();
         window!.Show();
     }
 
