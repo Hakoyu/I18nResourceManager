@@ -1,0 +1,75 @@
+﻿<UserControl
+  x:Class="I18nResourceManager.Views.StartView"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:views="clr-namespace:I18nResourceManager.Views"
+  xmlns:vm="using:I18nResourceManager.ViewModels"
+  d:DesignHeight="450"
+  d:DesignWidth="800"
+  x:DataType="vm:StartVM"
+  mc:Ignorable="d">
+  <Design.DataContext>
+    <vm:StartVM />
+  </Design.DataContext>
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+    <Grid Margin="10">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBox Margin="10" />
+        <ListBox
+          x:Name="ListBox_HistoricDatas"
+          Grid.Row="1"
+          Margin="10"
+          ItemsSource="{Binding HistoricDatas}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Label
+                  Margin="0"
+                  HorizontalAlignment="Left"
+                  Content="{Binding Name}"
+                  FontSize="{StaticResource SubTitleFontSize}"
+                  FontWeight="Bold" />
+                <TextBlock
+                  Grid.Row="1"
+                  Margin="5"
+                  Text="{Binding ProjectPath}" />
+                <TextBlock
+                  Margin="5"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Text="{Binding LastEditTime, StringFormat={}{0:yyyy/MM/dd HH:mm}}" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </Grid>
+    <Grid Grid.Column="1" Margin="10">
+      <StackPanel>
+        <Button
+          x:Name="Button_CreateNewProject"
+          Command="{Binding CreateProjectCommand}"
+          Content="新建" />
+        <Button
+          x:Name="Button_LoadProjectFromFile"
+          Command="{Binding LoadProjectFromDirectoryCommand}"
+          Content="从文件夹载入" />
+        <!--<Button Command="{Binding TestCommand}" Content="Test" />-->
+      </StackPanel>
+    </Grid>
+  </Grid>
+</UserControl>
