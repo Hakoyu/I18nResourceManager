@@ -26,7 +26,7 @@ internal partial class StartVM : ObservableObject
 
     #region Property
     [ObservableProperty]
-    private ObservableListX<HistoricData> _historicDatas = new();
+    private ObservableList<HistoricData> _historicDatas = new();
     #endregion
 
     #region Command
@@ -42,9 +42,23 @@ internal partial class StartVM : ObservableObject
     }
 
     [RelayCommand]
-    private void LoadProject(string path)
+    private async Task LoadProject(HistoricData data)
     {
-        var info = TOMLDeserializer.Deserialize<I18nResInfo>(TOML.ParseFromFile(path));
+        if (File.Exists(data.ProjectPath) is false)
+        {
+            if (
+                await _dialogService.ShowMessageBoxAsync(
+                    this,
+                    $"项目 \"{data.Name}\" 不存在, 是否从最近使用列表中移除它",
+                    "",
+                    HanumanInstitute.MvvmDialogs.FrameworkDialogs.MessageBoxButton.YesNo
+                )
+                is true
+            )
+                HistoricDatas.Remove(data);
+            return;
+        }
+        LoadProject(data.ProjectPath);
     }
 
     [RelayCommand]
@@ -65,7 +79,13 @@ internal partial class StartVM : ObservableObject
     [RelayCommand]
     private void Test()
     {
-        HistoricDatas.AddRange(HistoricData.GetCustomers(1000));
+        foreach (var item in HistoricData.GetCustomers(1000))
+            HistoricDatas.Add(item);
     }
     #endregion
+
+    private void LoadProject(string path)
+    {
+        var info = TOMLDeserializer.Deserialize<I18nResInfo>(TOML.ParseFromFile(path));
+    }
 }
